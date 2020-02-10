@@ -1,0 +1,12 @@
+# list of radio station names and stream URLs that need to be appended to mplayer command
+# source info: http://media-ice.musicradio.com for Global Radio stations
+# source info: http://forum.minimserver.com/showthread.php?tid=2173 for BBC Radio stations
+# prepend the following to each URL or playlist: "mplayer -nolirc -ao alsa:device=hw=0,0"
+# example scripts located under /usr/share/cosmicd
+# needed to add a comma for -playlist to break it out as a separate parameter
+
+"RADIO X,-playlist,http://media-ice.musicradio.com/RadioXUK.m3u
+"LBC,-playlist,http://media-ice.musicradio.com/LBCLondon.m3u
+"RADIO 1,http://a.files.bbci.co.uk/media/live/manifesto/audio/simulcast/hls/uk/sbr_high/ak/bbc_radio_one.m3u8
+"RADIO 3,http://a.files.bbci.co.uk/media/live/manifesto/audio/simulcast/hls/nonuk/low/ak/bbc_radio_three.m3u8
+"RADIO 4,http://a.files.bbci.co.uk/media/live/manifesto/audio/simulcast/hls/nonuk/low/ak/bbc_radio_fourfm.m3u8
