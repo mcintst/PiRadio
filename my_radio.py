@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # script to run raspberry pi as Internet Radio using the IQAudio Pi-DACZero and the IQAudio Cosmic Controller
 # read in the URLs for each of the streams and toggle through them using the rotary encoder
@@ -6,6 +6,7 @@
 # display the current radio station on the display
 #
 
+# Based on the following template:
 # Raspberry Pi IQAudio Cosmic Controller Development Templates
 # See IQAudio website at  http://iqaudio.co.uk
 #
@@ -20,7 +21,7 @@
 # License: GNU V3, See https://www.gnu.org/copyleft/gpl.html
 #
 # Disclaimer: Software is provided as is and absolutly no warranties are implied or given.
-#            The authors shall not be liable for any loss or damage however caused.
+#	    The authors shall not be liable for any loss or damage however caused.
 #
 #
 
@@ -50,39 +51,38 @@ statusLed = None
 Names = ['NO_EVENT', 'CLOCKWISE', 'ANTICLOCKWISE', 'BUTTON DOWN', 'BUTTON UP']
 
 def button_event(gpio):
-        global encoder_switch,left_switch,middle_switch
-        print "Button pressed on GPIO", gpio
+	global encoder_switch,left_switch,middle_switch
+	print("Button pressed on GPIO, {}".format(gpio))
 
 	statusLed.clear()
-        if gpio == left_switch:
-                statusLed.set(StatusLed.LED1,True)
-        elif gpio == middle_switch:
-                statusLed.set(StatusLed.LED2,True)
-        elif gpio == right_switch:
-                statusLed.set(StatusLed.LED3,True)
-
-        return
+	if gpio == left_switch:
+		statusLed.set(StatusLed.LED1,True)
+	elif gpio == middle_switch:
+		statusLed.set(StatusLed.LED2,True)
+	elif gpio == right_switch:
+		statusLed.set(StatusLed.LED3,True)
+	return
 
 # Test only - No event sent
 def rotary_event(event):
-        name = ''
-        try:
-                name = Names[event]
-        except:
-                name = 'ERROR'
+	name = ''
+	try:
+	        name = Names[event]
+	except:
+	        name = 'ERROR'
 
 	statusLed.clear()
-        if event == RotaryEncoder.CLOCKWISE:
-                statusLed.set(StatusLed.LED3,True)
+	if event == RotaryEncoder.CLOCKWISE:
+	        statusLed.set(StatusLed.LED3,True)
 
-        elif event == RotaryEncoder.ANTICLOCKWISE:
-                statusLed.set(StatusLed.LED1,True)
-        else:
+	elif event == RotaryEncoder.ANTICLOCKWISE:
+	        statusLed.set(StatusLed.LED1,True)
+	else:
 		# Handle button up/down
-                statusLed.clear()
+	        statusLed.clear()
 
-        print "Rotary event ", event, name
-        return
+	print("Rotary event {}, {}".format(event,name))
+	return
 
 # Configure status LED
 def statusLedInitialise(statusLed):
@@ -90,7 +90,7 @@ def statusLedInitialise(statusLed):
 	led2 = config.getLed2()
 	led3 = config.getLed3()
 	statusLed = StatusLed(led1,led2,led3)
-	print "statusLed",led1,led2,led3
+	print("statusLed,{},{},{}".format(led1,led2,led3))
 	return statusLed
 
 # Read in the list of Radio Stations and their URLS
@@ -115,7 +115,7 @@ def read_radio_stations():
 def start_audio_stream(radio_station_tuple):
 	subprocess_command = ["/usr/bin/mplayer","-nolirc","-ao","alsa:device=hw=0,0"]
 	subprocess_command = subprocess_command + radio_station_tuple[1]
-	print subprocess_command
+	print(subprocess_command)
 	subprocess.call(subprocess_command)
 
 #	subprocess.call(['/usr/bin/mplayer','-nolirc','-ao','alsa:device=hw=0,0','-playlist','http://media-ice.musicradio.com/RadioXUK.m3u'])
@@ -129,8 +129,8 @@ if __name__ == "__main__":
 	start_audio_stream(radio_station_list[0])
 
 
-	print "Test Cosmic Controller Class"
-	print "============================"
+	print("Test Cosmic Controller Class")
+	print("============================")
 
 	# Get configuration
 	left_switch = config.getLeftSwitch()
@@ -140,12 +140,12 @@ if __name__ == "__main__":
 	encoder_a = config.getEncoderA()
 	encoder_b = config.getEncoderB()
 
-	print "Left switch GPIO", left_switch
-	print "Middle switch GPIO", middle_switch
-	print "Right switch GPIO", right_switch
-	print "Encoder A GPIO", encoder_a
-	print "Encoder B GPIO", encoder_b
-	print "Encoder switch GPIO", encoder_switch
+	print("Left switch GPIO {}".format(left_switch))
+	print("Middle switch GPIO {}".format(middle_switch))
+	print("Right switch GPIO {}".format(right_switch))
+	print("Encoder A GPIO {}".format(encoder_a))
+	print("Encoder B GPIO {}".format(encoder_b))
+	print("Encoder switch GPIO {}".format(encoder_switch))
 
 	Button(left_switch, button_event)
 	Button(middle_switch, button_event)
@@ -171,7 +171,7 @@ if __name__ == "__main__":
 			time.sleep(0.2)
 
 	except KeyboardInterrupt:
-		print " Stopped"
+		print(" Stopped")
 		sys.exit(0)
 
 	# End of script
