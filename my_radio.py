@@ -23,7 +23,6 @@
 # Disclaimer: Software is provided as is and absolutly no warranties are implied or given.
 #	    The authors shall not be liable for any loss or damage however caused.
 #
-#
 
 import sys,os,pwd
 import time
@@ -71,17 +70,35 @@ def rotary_event(event):
 	except:
 	        name = 'ERROR'
 
+	global current_radio_station_index
+	global max_radio_station_index
 	statusLed.clear()
 	if event == RotaryEncoder.CLOCKWISE:
-	        statusLed.set(StatusLed.LED3,True)
-
+		statusLed.set(StatusLed.LED3,True)
+		current_radio_station_index = current_radio_station_index + 1
+		if (current_radio_station_index > max_radio_station_index):
+			current_radio_station_index = 0
 	elif event == RotaryEncoder.ANTICLOCKWISE:
-	        statusLed.set(StatusLed.LED1,True)
+		statusLed.set(StatusLed.LED1,True)
+		current_radio_station_index = current_radio_station_index - 1
+		if (current_radio_station_index < 0):
+			current_radio_station_index = max_radio_station_index
 	else:
 		# Handle button up/down
 	        statusLed.clear()
 
 	print("Rotary event {}, {}".format(event,name))
+	print("current_radio_station_index {}".format(current_radio_station_index))
+	global proc	
+	global radio_station_list	
+
+# try and stop any currently running mplayer process	
+	try:
+		stop_audio_stream(proc)
+	except NameError:
+		pass	
+	
+	proc = start_audio_stream(radio_station_list[current_radio_station_index])	
 	return
 
 # Configure status LED
@@ -113,21 +130,29 @@ def read_radio_stations():
 
 # Start an audio stream
 def start_audio_stream(radio_station_tuple):
-	subprocess_command = ["/usr/bin/mplayer","-nolirc","-ao","alsa:device=hw=0,0"]
+	subprocess_command = ["/usr/bin/mplayer","-really-quiet","-nolirc","-ao","alsa:device=hw=0,0"]
 	subprocess_command = subprocess_command + radio_station_tuple[1]
 	print(subprocess_command)
-	subprocess.call(subprocess_command)
+#	subprocess.call(subprocess_command)
+	proc = subprocess.Popen(subprocess_command)
 
 #	subprocess.call(['/usr/bin/mplayer','-nolirc','-ao','alsa:device=hw=0,0','-playlist','http://media-ice.musicradio.com/RadioXUK.m3u'])
+	return proc
+
+def stop_audio_stream(proc):
+	proc.kill()
+	print("Issued Kill command!!!")
+	time.sleep(1)	
 	return
 
 if __name__ == "__main__":
 
 	radio_station_list = read_radio_stations()	
+	max_radio_station_index = len(radio_station_list)-1
+	current_radio_station_index = 0
 #	print radio_station_list
 
-	start_audio_stream(radio_station_list[0])
-
+	proc = start_audio_stream(radio_station_list[current_radio_station_index])
 
 	print("Test Cosmic Controller Class")
 	print("============================")
