@@ -96,8 +96,7 @@ def rotary_event(event):
 	try:
 		stop_audio_stream(proc)
 	except NameError:
-		pass	
-	
+		pass
 	proc = start_audio_stream(radio_station_list[current_radio_station_index])	
 	return
 
@@ -123,7 +122,8 @@ def read_radio_stations():
 # add the rest of the array to the tuple
 
 			temp_tuple.append(temp_array[1:])
-			radio_station_list.append(temp_tuple)
+			radio_station_list.append(temp_tuple[:])
+			temp_tuple.clear()
 		next				
 
 	return radio_station_list
@@ -132,17 +132,24 @@ def read_radio_stations():
 def start_audio_stream(radio_station_tuple):
 	subprocess_command = ["/usr/bin/mplayer","-really-quiet","-nolirc","-ao","alsa:device=hw=0,0"]
 	subprocess_command = subprocess_command + radio_station_tuple[1]
-	print(subprocess_command)
-#	subprocess.call(subprocess_command)
+	#print(subprocess_command)
 	proc = subprocess.Popen(subprocess_command)
-
-#	subprocess.call(['/usr/bin/mplayer','-nolirc','-ao','alsa:device=hw=0,0','-playlist','http://media-ice.musicradio.com/RadioXUK.m3u'])
 	return proc
 
 def stop_audio_stream(proc):
-	proc.kill()
-	print("Issued Kill command!!!")
-	time.sleep(1)	
+	try:	
+		print("About to kill PID:{}".format(proc.pid))
+		proc.terminate()
+		outs, errs = proc.communicate()
+		print("outs: {}".format(outs))
+		print("errs: {}".format(errs))
+
+#	except TimeoutExpired:
+#		print("TimeoutExpired")
+	except:
+		print("Unexpected error: {}".format(sys.exc_info()[0]))
+		raise
+
 	return
 
 if __name__ == "__main__":
@@ -150,9 +157,9 @@ if __name__ == "__main__":
 	radio_station_list = read_radio_stations()	
 	max_radio_station_index = len(radio_station_list)-1
 	current_radio_station_index = 0
-#	print radio_station_list
-
+#	print(radio_station_list)
 	proc = start_audio_stream(radio_station_list[current_radio_station_index])
+	print("PID: {}".format(proc.pid))
 
 	print("Test Cosmic Controller Class")
 	print("============================")
